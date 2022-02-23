@@ -40,13 +40,13 @@ After running this, the Redshift database should exist with tables `songplays`, 
 
 ## Schema
 
-The database uses a star schema optimized for song play analytical queries. It includes the following tables (fact table populated from files located in `data/log_data`, dimension tables populated with information in `data/song_data`):
+The database uses a star schema optimized for song play analytical queries. It includes the following tables:
 
-The fact table is `songplays` (populated from files located in `data/log_data`, with columns `song_id` from `songs` table and `artist_id` from `artist` table)
+The fact table is `songplays` (populated from files located in the S3 buckets `s3://udacity-dend/log_data`, with columns `song_id` from `songs` table and `artist_id` from `artist` table)
 - `songplays` (fact table); columns: 
   - `songplay_id`,`start_time`,`user_id`,`level`,`song_id`,`artist_id`,`session_id`,`location`,`user_agent`
 
-The dimensions tables are populated with data from the song information in `data/song_data`. They include the following tables:
+The dimensions tables are populated with data from the song information in the S3 buckets `s3://udacity-dend/song_data`. They include the following tables:
 
 - `users`: users in the app, with columns: 
   - `user_id`,`first_name`,`last_name`,`gender`,`level`
