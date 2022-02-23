@@ -127,11 +127,18 @@ songplay_table_insert = ("""
         staging_events.location,
         useragent as user_agent
     FROM staging_events
-    LEFT JOIN songs ON staging_events.song = songs.title
-    LEFT JOIN artists ON staging_events.artist = artists.name
-    WHERE staging_events.page = "NextSong"
+    LEFT JOIN songs ON staging_events.song = songs.title AND staging_events.length = songs.duration
+    LEFT JOIN artists ON staging_events.artist = artists.name AND artists.artist_id = songs.artist_id
+    WHERE staging_events.page = 'NextSong'
     );
 """)
+# get songs.song_id, artists.artist_id 
+# from songs
+# inner join artists on aritst_id = aritsti_id
+# where songs.title = (osmething) and artists.name = (something) and songs.duration = (something)
+
+# match song from staging_events => get song id and artist id 
+# by matching song title/name, artist name and durating/length
 
 # also have to use select into ... from ... here
 user_table_insert = ("""
