@@ -65,33 +65,22 @@ Using the star schema may increase query time if every query requires joining th
 
 The pipeline: 
 
-** now just do this **
-
-1. Delete existing `sparkifydb` database, if any
-2. Create `sparkifydb` database and tables `songplays`, `users`, `songs`, `artists`, and `time` with schema described above
-3. For each file in `data/song_data`:
-  1. Read file into pandas dataframe
-  2. Select song information and insert record into `songs` table
-  3. Select artist information and insert record into `artists` table
-4. For each file in `data/log_data`:
-  1. Read file into pandas dataframe
-  2. Process: filter dataframe by page equal to "NextSong", convert time from milliseconds to timestamp
-  3. Create dataframe of timestamps with specific time units and insert into `time` table
-  4. Create dataframe of users from logs, deduplicate and insert into `users` table (updating `level` if there is a conflict with a previous record)
-  5. For each songplay record in the dataframe:
-    - use artist, song title and song length to query `songs` table to get `song_id`, and `artists` table to get `artist_id`
-    - add `song_id` and `artist_id` to the record
-    - insert record into `songplays` table
+1. Create Redshift cluster (via AWS console), copy endpoint and user credentials to `dwh.cfg`
+2. Drop existing staging tables: `staging_events` and `staging_songs`
+3. Drop existing analytical tables: `songplays`, `users`, `songs`, `artists`, and `time`. 
+4. Create new staging and analytical tables
+5. Copy events and songs from S3 buckets into staging tables
+6. Insert songplay data into from the staging tables into the `songplays` fact table and dimensions from the staging tables into the dimension tables
 
 ## Example queries
 
 Top 5 songs by number of plays:
 ```
-SELECT COUNT(*) AS total_plays, songplays.songplay_id, songs.title, artists.name
+SELECT COUNT(*) AS total_plays, songs.title, artists.name
 FROM songplays
 LEFT JOIN songs ON songplays.song_id = songs.song_id
 LEFT JOIN artists ON songplays.artist_id = artists.artist_id
-GROUP BY songplays.songplay_id, songs.title, artists.name
+GROUP BY songs.title, artists.name
 ORDER BY total_plays DESC
 LIMIT 5;
 ```

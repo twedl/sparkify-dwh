@@ -116,31 +116,27 @@ staging_songs_copy = ("""
 
 songplay_table_insert = (""" 
     INSERT INTO songplays (
-    SELECT
-        event_id as songplay_id,
-        date_add('ms', ts, '1970-01-01') as start_time,
-        userid as user_id,
-        level,
-        songs.song_id,
-        artists.artist_id,
-        sessionid as session_id,
-        staging_events.location,
-        useragent as user_agent
-    FROM staging_events
-    LEFT JOIN songs ON staging_events.song = songs.title AND staging_events.length = songs.duration
-    LEFT JOIN artists ON staging_events.artist = artists.name AND artists.artist_id = songs.artist_id
-    WHERE staging_events.page = 'NextSong'
+        SELECT
+            event_id as songplay_id,
+            date_add('ms', ts, '1970-01-01') as start_time,
+            userid as user_id,
+            level,
+            A.song_id,
+            A.artist_id,
+            sessionid as session_id,
+            location,
+            useragent as user_agent
+        FROM staging_events
+        LEFT JOIN (
+            SELECT distinct song, artist, length, songs.song_id, artists.artist_id
+            FROM staging_events
+            INNER JOIN songs ON staging_events.song = songs.title AND staging_events.length = songs.duration
+            INNER JOIN artists ON staging_events.artist = artists.name AND artists.artist_id = songs.artist_id
+        ) as A ON staging_events.song = A.song AND staging_events.artist = A.artist
+        WHERE staging_events.page = 'NextSong'
     );
 """)
-# get songs.song_id, artists.artist_id 
-# from songs
-# inner join artists on aritst_id = aritsti_id
-# where songs.title = (osmething) and artists.name = (something) and songs.duration = (something)
 
-# match song from staging_events => get song id and artist id 
-# by matching song title/name, artist name and durating/length
-
-# also have to use select into ... from ... here
 user_table_insert = ("""
     INSERT INTO users(
         SELECT DISTINCT userid as user_id, firstname as first_name, lastname as last_name, gender,

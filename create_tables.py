@@ -69,8 +69,8 @@ def main():
     conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['CLUSTER'].values()))
     cur = conn.cursor()
 
-    # drop_staging_tables(cur, conn)
-    # create_staging_tables(cur, conn)
+    drop_staging_tables(cur, conn)
+    create_staging_tables(cur, conn)
     drop_tables(cur, conn)
     create_tables(cur, conn)
 
