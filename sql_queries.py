@@ -121,19 +121,14 @@ songplay_table_insert = ("""
             date_add('ms', ts, '1970-01-01') as start_time,
             userid as user_id,
             level,
-            A.song_id,
-            A.artist_id,
+            b.song_id,
+            b.artist_id,
             sessionid as session_id,
             location,
             useragent as user_agent
-        FROM staging_events
-        LEFT JOIN (
-            SELECT distinct song, artist, length, songs.song_id, artists.artist_id
-            FROM staging_events
-            INNER JOIN songs ON staging_events.song = songs.title AND staging_events.length = songs.duration
-            INNER JOIN artists ON staging_events.artist = artists.name AND artists.artist_id = songs.artist_id
-        ) as A ON staging_events.song = A.song AND staging_events.artist = A.artist
-        WHERE staging_events.page = 'NextSong'
+        FROM staging_events AS a
+        LEFT JOIN staging_songs AS b ON a.song = b.title AND a.artist = b.artist_name AND a.length = b.duration
+        WHERE a.page = 'NextSong'
     );
 """)
 
