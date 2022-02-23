@@ -129,6 +129,7 @@ songplay_table_insert = ("""
     FROM staging_events
     LEFT JOIN songs ON staging_events.song = songs.title
     LEFT JOIN artists ON staging_events.artist = artists.name
+    WHERE staging_events.page = "NextSong"
     );
 """)
 
